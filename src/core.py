@@ -49,6 +49,15 @@ def run_game(state: GameState, next_food: Position, board_rows: int, board_cols:
 
     if not ate: new_snake = lose_tail(new_snake)
     if is_colliding(new_snake): return replace(state, status=Status.DEFEAT)
+    if ate and len(new_snake.body) == board_rows * board_cols:
+        new_score = state.score + 1
+        return replace(
+            state,
+            status=Status.VICTORY,
+            snake=new_snake,
+            score=new_score,
+            record=max(new_score, state.record)
+        )
 
     new_score = state.score + (1 if ate else 0)
     new_food = next_food if ate else state.food
