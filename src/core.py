@@ -12,8 +12,9 @@ INVALID_DIRECTION_TRANSITIONS = {
 def validate_direction_transition(current: Direction, new: Direction) -> Direction:
     return current if frozenset((current, new)) in INVALID_DIRECTION_TRANSITIONS else new
 
-def turn(snake: Snake, new_direction: Direction) -> Snake:
-    return replace(snake, direction=validate_direction_transition(snake.direction, new_direction))
+def turn_snake(state: GameState, new_direction: Direction) -> GameState:
+    new_snake = replace(state.snake, direction=validate_direction_transition(state.snake.direction, new_direction))
+    return replace(state, snake=new_snake)
 
 def next_head(snake: Snake, board_rows: int, board_cols: int) -> Position:
     head = snake.body[0]
