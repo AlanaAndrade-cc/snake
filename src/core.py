@@ -73,6 +73,9 @@ def run_game(state: GameState, next_food: Position, board_rows: int, board_cols:
         speed=new_speed
     )
 
+def start_game(state: GameState) -> GameState:
+    return replace(state, status=Status.RUNNING)
+
 def pause_game(state: GameState) -> GameState:
     return replace(state, status=Status.PAUSED)
 
