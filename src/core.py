@@ -9,12 +9,11 @@ INVALID_DIRECTION_TRANSITIONS = {
     frozenset((Direction.LEFT, Direction.RIGHT)),
 }
 
-def validate_direction_transition(current: Direction, new: Direction) -> Ok[Direction]:
-    return Ok(new) if frozenset((current, new)) not in INVALID_DIRECTION_TRANSITIONS else Ok(current)
+def validate_direction_transition(current: Direction, new: Direction) -> Direction:
+    return current if frozenset((current, new)) in INVALID_DIRECTION_TRANSITIONS else new
 
 def turn(snake: Snake, new_direction: Direction) -> Snake:
-    valid_direction = validate_direction_transition(snake.direction, new_direction).unwrap_or(snake.direction)
-    return replace(snake, direction=valid_direction)
+    return replace(snake, direction=validate_direction_transition(snake.direction, new_direction))
 
 def next_head(head: Position, direction: Direction, board_rows: int, board_cols: int) -> Position:
     match direction:
