@@ -44,7 +44,7 @@ def is_colliding(snake: Snake) -> bool:
     head, body = snake.body[0], snake.body[1:]
     return head in body
 
-def run_game(state: GameState, next_food: Position, board_rows: int, board_cols: int) -> GameState:
+def step_game(state: GameState, next_food: Position, board_rows: int, board_cols: int) -> GameState:
     new_snake = slide(state.snake, board_rows, board_cols)
     ate = is_eating(new_snake, state.food)
 
@@ -96,5 +96,5 @@ def quit_game(state: GameState) -> GameState:
 
 def tick(state: GameState, next_food: Position, board_rows: int, board_cols: int) -> GameState:
     if state.status == Status.RUNNING:
-        return run_game(state, next_food, board_rows, board_cols)
+        return step_game(state, next_food, board_rows, board_cols)
     return state
