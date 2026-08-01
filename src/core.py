@@ -15,7 +15,9 @@ def validate_direction_transition(current: Direction, new: Direction) -> Directi
 def turn(snake: Snake, new_direction: Direction) -> Snake:
     return replace(snake, direction=validate_direction_transition(snake.direction, new_direction))
 
-def next_head(head: Position, direction: Direction, board_rows: int, board_cols: int) -> Position:
+def next_head(snake: Snake, board_rows: int, board_cols: int) -> Position:
+    head = snake.body[0]
+    direction = snake.direction
     match direction:
         case Direction.RIGHT: row_inc, col_inc = (0, 1)
         case Direction.LEFT: row_inc, col_inc = (0, -1)
@@ -27,7 +29,7 @@ def next_head(head: Position, direction: Direction, board_rows: int, board_cols:
     )
 
 def slide(snake: Snake, board_rows: int, board_cols: int) -> Snake:
-    new_head = next_head(snake.body[0], snake.direction, board_rows, board_cols)
+    new_head = next_head(snake, board_rows, board_cols)
     new_body = (new_head,) + snake.body
     return replace(snake, body=new_body)
 
