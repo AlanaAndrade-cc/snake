@@ -10,19 +10,27 @@ class Direction(Enum):
     RIGHT = auto()
 
 class Status(Enum):
-    START = auto()      # initial screen                    press q to QUIT, any other key to RUNNING
-    RUNNING = auto()    # game functioning                  press q to QUIT, r to RUNNING, p to PAUSED arrows to change direction
-    PAUSED = auto()     # screen with pause message         press q to QUIT, r to RUNNING, esc to RUNNING
-    DEFEAT = auto()     # screen with game over message     press q to QUIT, r to RUNNING
-    VICTORY = auto()    # screen with victory message       press q to QUIT, r to RUNNING
-    QUIT = auto()       # final screen
+    START = auto()
+    RUNNING = auto()
+    PAUSED = auto()
+    DEFEAT = auto()
+    VICTORY = auto()
+    QUIT = auto()
+
+class Action(Enum):
+    NONE = auto()
+    START = auto()
+    PAUSE = auto()
+    RESUME = auto()
+    RESTART = auto()
+    QUIT = auto()
 
 @dataclass(frozen=True)
 class Position:
     row: int
     col: int
 
-type Body = tuple[Position, ...]
+Body = tuple[Position, ...]
 
 @dataclass(frozen=True)
 class Snake:
