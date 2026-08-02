@@ -59,8 +59,9 @@ def validate_terminal_dimensions(terminal: Terminal) -> Result[Terminal, str]:
         )
     return Ok(terminal)
 
-def draw_board(terminal: Terminal, state: GameState, board_rows: int, board_cols: int) -> str:
+def draw_board(terminal: Terminal, state: GameState) -> str:
     output = []
+    board_rows, board_cols = get_board_dimensions(terminal)
 
     horizontal_lines = HORIZONTAL * board_cols
     margin_y, margin_x = get_margins(terminal)
@@ -117,10 +118,10 @@ def draw_board(terminal: Terminal, state: GameState, board_rows: int, board_cols
     
     return "".join(output)
 
-def draw_overlay(terminal: Terminal, state: GameState, board_rows: int, board_cols: int) -> str:
+def draw_overlay(terminal: Terminal, state: GameState) -> str:
     if state.status == Status.RUNNING:
         return ""
-
+    
     messages = {
         Status.START:   ["WELCOME TO SNAKE".center(OVERLAY_WIDTH, " "), "Press any key".center(OVERLAY_WIDTH, " "), "to start".center(OVERLAY_WIDTH, " ")],
         Status.PAUSED:  ["PAUSED GAME".center(OVERLAY_WIDTH, " "), "[P/ESC] to resume".center(OVERLAY_WIDTH, " "), "[R] to restart".center(OVERLAY_WIDTH, " ")],
@@ -131,8 +132,9 @@ def draw_overlay(terminal: Terminal, state: GameState, board_rows: int, board_co
     lines = messages.get(state.status, [])
     if not lines:
         return ""
-        
+    
     output = []
+    board_rows, board_cols = get_board_dimensions(terminal)
     margin_y, margin_x = get_margins(terminal)
     start_y = margin_y + (board_rows // 2) - (len(lines) // 2)
     
@@ -172,8 +174,8 @@ def game_loop(terminal: Terminal) -> Result[None, str]:
             last_time = current_time
             accumulator += delta_time
             
-            board_str = draw_board(terminal, state, board_rows, board_cols)
-            overlay_str = draw_overlay(terminal, state, board_rows, board_cols)
+            board_str = draw_board(terminal, state)
+            overlay_str = draw_overlay(terminal, state)
             print(terminal.clear + terminal.move_xy(0, 0) + board_str + overlay_str, end="", flush=True)
             
             key = terminal.inkey(timeout=0.016)
