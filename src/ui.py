@@ -147,11 +147,10 @@ def draw_overlay(terminal: Terminal, state: GameState) -> str:
 
 def game_loop(terminal: Terminal) -> Result[None, str]:
     board_rows, board_cols = get_board_dimensions(terminal)
-    initial_snake = Snake(
-        body=(Position(board_rows // 2, board_cols // 2),),
-        direction=Direction.RIGHT
-    )
-    initial_food = Position(board_rows // 4, board_cols // 4)
+    middle_row = board_rows // 2
+    middle_col = board_cols // 2
+    initial_snake = Snake((Position(middle_row, middle_col),), Direction.RIGHT)
+    initial_food = generate_food(initial_snake, board_rows, board_cols).unwrap()
     initial_speed = 5.0
     
     state = GameState(
@@ -182,7 +181,13 @@ def game_loop(terminal: Terminal) -> Result[None, str]:
             
             if key:
                 key_name = str(key.name or key)
-                state = handle_control_key(state, key_name, initial_snake, initial_food, initial_speed)
+                state = handle_control_key(
+                    state=state, 
+                    key=key_name, 
+                    initial_snake=initial_snake, 
+                    initial_food=generate_food(initial_snake, board_rows, board_cols).unwrap(), 
+                    initial_speed=initial_speed
+                )
                 if state.status == Status.RUNNING:
                     match key_to_direction(key_name):
                         case Ok(new_dir):
