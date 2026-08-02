@@ -45,3 +45,5 @@ class GameState:
     score: int
     record: int
     speed: float
+
+History = list[GameState]

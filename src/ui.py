@@ -5,7 +5,7 @@ import random
 from constants import *
 from blessed import Terminal
 from result import Ok, Err, Result
-from models import Action, Direction, GameState, Position, Snake, Status
+from models import Action, Direction, GameState, History, Position, Snake, Status
 from core import pause_game, quit_game, restart_game, start_game, tick, turn_snake
 
 def generate_food(snake: Snake, num_rows: int, num_cols: int) -> Result[Position, str]:
@@ -163,7 +163,7 @@ def game_loop(terminal: Terminal) -> Result[list[GameState], str]:
     
     last_time = time.monotonic()
     accumulator = 0.0
-    history: list[GameState] = []
+    history: History = []
     
     with terminal.fullscreen(), terminal.cbreak(), terminal.hidden_cursor():
         while state.status != Status.QUIT:

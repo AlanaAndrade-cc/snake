@@ -60,3 +60,5 @@ ACTION_KEYS = {
         "_": Action.NONE,
     },
 }
+
+STATUS_TO_REPLAY = (Status.DEFEAT, Status.QUIT)
