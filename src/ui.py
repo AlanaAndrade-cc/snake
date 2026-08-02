@@ -198,9 +198,9 @@ def game_loop(terminal: Terminal) -> Result[list[GameState], str]:
                     
     return Ok(history)
 
-def run_ui() -> list[GameState]:
+def run() -> None:
     terminal = Terminal()
-    return validate_terminal_dimensions(terminal).and_then(game_loop).unwrap_or_else(print)
+    validate_terminal_dimensions(terminal).and_then(game_loop).unwrap_or_else(print)
 
 def replay(terminal: Terminal, history: History) -> None:
     if not history: return
