@@ -59,7 +59,7 @@ def validate_terminal_dimensions(terminal: Terminal) -> Result[Terminal, str]:
         )
     return Ok(terminal)
 
-def draw_board(terminal: Terminal, state: GameState) -> str:
+def draw_board(terminal: Terminal, state: GameState, replay_info: tuple[int, int] | None = None) -> str:
     output = []
     board_rows, board_cols = get_board_dimensions(terminal)
 
@@ -79,25 +79,33 @@ def draw_board(terminal: Terminal, state: GameState) -> str:
 
     stats_y = top_edge - 2
     shortcuts_y = bottom_edge + 2
-
-    score_str = f"SCORE: {state.score}"
-    record_str = f"BEST: {state.record}"
-    speed_str = f"SPEED: {state.speed:.1f}"
-    pause_str = "[P] Pause"
     quit_str = "[Q/ESC] Quit"
-
     GAP = 11
-    score_x = left_edge
-    pause_x = left_edge
-    speed_x = score_x + GAP
-    quit_x = pause_x + GAP
-    record_x = right_edge + 1 - len(record_str)
+    if replay_info is None:
+        score_str = f"SCORE: {state.score}"
+        record_str = f"BEST: {state.record}"
+        speed_str = f"SPEED: {state.speed:.1f}"
+        score_x = left_edge
+        speed_x = score_x + GAP
+        record_x = right_edge + 1 - len(record_str)
+        output.append(terminal.move_xy(score_x, stats_y) + terminal.bold_blue(score_str))
+        output.append(terminal.move_xy(speed_x, stats_y) + terminal.bold_magenta(speed_str))
+        output.append(terminal.move_xy(record_x, stats_y) + terminal.bold_yellow(record_str))
 
-    output.append(terminal.move_xy(score_x, stats_y) + terminal.bold_blue(score_str))
-    output.append(terminal.move_xy(speed_x, stats_y) + terminal.bold_magenta(speed_str))
-    output.append(terminal.move_xy(record_x, stats_y) + terminal.bold_yellow(record_str))
+        pause_str = "[P] Pause"
+        pause_x = left_edge
+        quit_x = pause_x + GAP
+        output.append(terminal.move_xy(pause_x, shortcuts_y) + terminal.bold_white(pause_str))
+    else:
+        replay_title = "[ REPLAY ACELERADO ]".center(OVERLAY_WIDTH, " ")
+        header_x = margin_x + max(0, (board_cols // 2) - (len(replay_title) // 2))
+        output.append(terminal.move_xy(header_x, max(0, margin_y - 2)) + terminal.bold_white_on_blue(replay_title))
 
-    output.append(terminal.move_xy(pause_x, shortcuts_y) + terminal.bold_white(pause_str))
+        current_step, total_steps = replay_info
+        step_str = f"STEP: {current_step}/{total_steps}"
+        quit_x = left_edge
+        step_x = right_edge + 1 - len(step_str)
+        output.append(terminal.move_xy(step_x, shortcuts_y) + terminal.bold_white(step_str))
     output.append(terminal.move_xy(quit_x, shortcuts_y) + terminal.bold_white(quit_str))
 
     food_x = margin_x + state.food.col
@@ -216,19 +224,14 @@ def run() -> None:
 def replay(terminal: Terminal, history: History) -> None:
     if not history: return
 
-    board_rows, board_cols = get_board_dimensions(terminal)
+    _, board_cols = get_board_dimensions(terminal)
     total_frames = len(history)
-    margin_y, _ = get_margins(terminal)
+    margin_y, margin_x = get_margins(terminal)
 
     with terminal.fullscreen(), terminal.cbreak(), terminal.hidden_cursor():
-        for index, state in enumerate(history, start=0):
-            board_str = draw_board(terminal, state)
-
-            replay_title = f" [ REPLAY ACELERADO — PASSO {index}/{total_frames} — PRESSIONE Q PARA SAIR ] "
-            header_x = max(0, (terminal.width // 2) - (len(replay_title) // 2))
-            header_str = terminal.move_xy(header_x, max(0, margin_y - 2)) + terminal.bold_white_on_blue(replay_title)
-
-            print(terminal.clear + terminal.move_xy(0, 0) + board_str + header_str, end="", flush=True)
+        for index, state in enumerate(history, start=1):
+            board_str = draw_board(terminal, state, replay_info=(index, total_frames))
+            print(terminal.clear + terminal.move_xy(0, 0) + board_str, end="", flush=True)
             key = terminal.inkey(timeout=0.04)
             if key:
                 key_name = str(key.name or key).lower()
