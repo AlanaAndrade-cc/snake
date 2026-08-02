@@ -59,6 +59,33 @@ def validate_terminal_dimensions(terminal: Terminal) -> Result[Terminal, str]:
         )
     return Ok(terminal)
 
+def draw_overlay(terminal: Terminal, state: GameState) -> str:
+    if state.status == Status.RUNNING:
+        return ""
+    
+    messages = {
+        Status.START:   ["WELCOME TO SNAKE".center(OVERLAY_WIDTH, " "), "Press any key".center(OVERLAY_WIDTH, " "), "to start".center(OVERLAY_WIDTH, " ")],
+        Status.PAUSED:  ["PAUSED GAME".center(OVERLAY_WIDTH, " "), "[P/ESC] to resume".center(OVERLAY_WIDTH, " "), "[R] to restart".center(OVERLAY_WIDTH, " ")],
+        Status.DEFEAT:  ["GAME OVER!".center(OVERLAY_WIDTH, " "), "[R] to try again".center(OVERLAY_WIDTH, " "), "[Q] to quit".center(OVERLAY_WIDTH, " ")],
+        Status.VICTORY: ["PERFECT VICTORY!".center(OVERLAY_WIDTH, " "), "[R] to play again".center(OVERLAY_WIDTH, " "), "[Q] to quit".center(OVERLAY_WIDTH, " ")],
+    }
+
+    lines = messages.get(state.status, [])
+    if not lines:
+        return ""
+    
+    output = []
+    board_rows, board_cols = get_board_dimensions(terminal)
+    margin_y, margin_x = get_margins(terminal)
+    start_y = margin_y + (board_rows // 2) - (len(lines) // 2)
+    
+    for i, line in enumerate(lines):
+        start_x = margin_x + max(0, (board_cols // 2) - (len(line) // 2))
+        style = terminal.black_on_yellow if state.status == Status.PAUSED else terminal.bold_white_on_red
+        output.append(terminal.move_xy(start_x, start_y + i) + style(line))
+        
+    return "".join(output)
+
 def draw_board(terminal: Terminal, state: GameState, replay_info: tuple[int, int] | None = None) -> str:
     output = []
     board_rows, board_cols = get_board_dimensions(terminal)
@@ -123,34 +150,9 @@ def draw_board(terminal: Terminal, state: GameState, replay_info: tuple[int, int
     head_x = margin_x + head.col
     head_y = margin_y + head.row
     output.append(terminal.move_xy(head_x, head_y) + terminal.bold_green(HEAD))
-    
-    return "".join(output)
 
-def draw_overlay(terminal: Terminal, state: GameState) -> str:
-    if state.status == Status.RUNNING:
-        return ""
-    
-    messages = {
-        Status.START:   ["WELCOME TO SNAKE".center(OVERLAY_WIDTH, " "), "Press any key".center(OVERLAY_WIDTH, " "), "to start".center(OVERLAY_WIDTH, " ")],
-        Status.PAUSED:  ["PAUSED GAME".center(OVERLAY_WIDTH, " "), "[P/ESC] to resume".center(OVERLAY_WIDTH, " "), "[R] to restart".center(OVERLAY_WIDTH, " ")],
-        Status.DEFEAT:  ["GAME OVER!".center(OVERLAY_WIDTH, " "), "[R] to try again".center(OVERLAY_WIDTH, " "), "[Q] to quit".center(OVERLAY_WIDTH, " ")],
-        Status.VICTORY: ["PERFECT VICTORY!".center(OVERLAY_WIDTH, " "), "[R] to play again".center(OVERLAY_WIDTH, " "), "[Q] to quit".center(OVERLAY_WIDTH, " ")],
-    }
+    output.append(draw_overlay(terminal, state))
 
-    lines = messages.get(state.status, [])
-    if not lines:
-        return ""
-    
-    output = []
-    board_rows, board_cols = get_board_dimensions(terminal)
-    margin_y, margin_x = get_margins(terminal)
-    start_y = margin_y + (board_rows // 2) - (len(lines) // 2)
-    
-    for i, line in enumerate(lines):
-        start_x = margin_x + max(0, (board_cols // 2) - (len(line) // 2))
-        style = terminal.black_on_yellow if state.status == Status.PAUSED else terminal.bold_white_on_red
-        output.append(terminal.move_xy(start_x, start_y + i) + style(line))
-        
     return "".join(output)
 
 def game_loop(terminal: Terminal) -> Result[None, str]:
@@ -182,8 +184,7 @@ def game_loop(terminal: Terminal) -> Result[None, str]:
             accumulator += delta_time
             
             board_str = draw_board(terminal, state)
-            overlay_str = draw_overlay(terminal, state)
-            print(terminal.clear + terminal.move_xy(0, 0) + board_str + overlay_str, end="", flush=True)
+            print(terminal.clear + terminal.move_xy(0, 0) + board_str, end="", flush=True)
             
             key = terminal.inkey(timeout=0.016)
             
