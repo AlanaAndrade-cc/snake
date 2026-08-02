@@ -201,3 +201,25 @@ def game_loop(terminal: Terminal) -> Result[list[GameState], str]:
 def run_ui() -> list[GameState]:
     terminal = Terminal()
     return validate_terminal_dimensions(terminal).and_then(game_loop).unwrap_or_else(print)
+
+def replay(terminal: Terminal, history: History) -> None:
+    if not history: return
+
+    board_rows, board_cols = get_board_dimensions(terminal)
+    total_frames = len(history)
+    margin_y, _ = get_margins(terminal)
+
+    with terminal.fullscreen(), terminal.cbreak(), terminal.hidden_cursor():
+        for index, state in enumerate(history, start=0):
+            board_str = draw_board(terminal, state)
+
+            replay_title = f" [ REPLAY ACELERADO — PASSO {index}/{total_frames} — PRESSIONE Q PARA SAIR ] "
+            header_x = max(0, (terminal.width // 2) - (len(replay_title) // 2))
+            header_str = terminal.move_xy(header_x, max(0, margin_y - 2)) + terminal.bold_white_on_blue(replay_title)
+
+            print(terminal.clear + terminal.move_xy(0, 0) + board_str + header_str, end="", flush=True)
+            key = terminal.inkey(timeout=0.04)
+            if key:
+                key_name = str(key.name or key).lower()
+                if key_name in ('q', 'key_escape'):
+                    break
