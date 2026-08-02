@@ -2,69 +2,11 @@
 
 import time
 import random
+from constants import *
 from blessed import Terminal
 from result import Ok, Err, Result
 from models import Action, Direction, GameState, Position, Snake, Status
 from core import pause_game, quit_game, restart_game, start_game, tick, turn_snake
-
-MIN_HEIGHT = 20
-MIN_WIDTH = 40
-MARGIN_PERC = 0.1
-OVERLAY_WIDTH = 30
-
-TOP_LEFT = "┌"
-TOP_RIGHT = "┐"
-BOTTOM_LEFT = "└"
-BOTTOM_RIGHT = "┘"
-HORIZONTAL = "─"
-VERTICAL = "│"
-FOOD = "●"
-HEAD = "0"
-BODY = "o"
-
-DIRECTION_KEYS = {
-    "w": Direction.UP,
-    "s": Direction.DOWN,
-    "a": Direction.LEFT,
-    "d": Direction.RIGHT,
-    "key_up": Direction.UP,
-    "key_down": Direction.DOWN,
-    "key_left": Direction.LEFT,
-    "key_right": Direction.RIGHT,
-}
-
-ACTION_KEYS = {
-    Status.START: {
-        "q": Action.QUIT,
-        "key_escape": Action.QUIT,
-        "_": Action.START,
-    },
-    Status.RUNNING: {
-        "p": Action.PAUSE,
-        "q": Action.QUIT,
-        "key_escape": Action.QUIT,
-        "_": Action.NONE,
-    },
-    Status.PAUSED: {
-        "r": Action.RESTART,
-        "p": Action.RESUME,
-        "key_escape": Action.RESUME,
-        "q": Action.QUIT,
-        "_": Action.NONE,
-    },
-    Status.DEFEAT: {
-        "r": Action.RESTART,
-        "q": Action.QUIT,
-        "key_escape": Action.QUIT,
-        "_": Action.NONE,
-    },
-    Status.VICTORY: {
-        "r": Action.RESTART,
-        "q": Action.QUIT,
-        "key_escape": Action.QUIT,
-        "_": Action.NONE,
-    },
-}
 
 def generate_food(snake: Snake, num_rows: int, num_cols: int) -> Result[Position, str]:
     occupied_spaces = set(snake.body)
