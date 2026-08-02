@@ -1,3 +1,5 @@
+"Measurement, icon, and key mapping constants."
+
 from models import Action, Direction, Status
 
 MIN_HEIGHT = 20
