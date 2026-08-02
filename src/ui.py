@@ -225,10 +225,7 @@ def run() -> None:
 def replay(terminal: Terminal, history: History) -> None:
     if not history: return
 
-    _, board_cols = get_board_dimensions(terminal)
     total_frames = len(history)
-    margin_y, margin_x = get_margins(terminal)
-
     with terminal.fullscreen(), terminal.cbreak(), terminal.hidden_cursor():
         for index, state in enumerate(history, start=1):
             board_str = draw_board(terminal, state, replay_info=(index, total_frames))
