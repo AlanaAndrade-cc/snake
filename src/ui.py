@@ -59,9 +59,9 @@ def validate_terminal_dimensions(terminal: Terminal) -> Result[Terminal, str]:
         )
     return Ok(terminal)
 
-def draw_overlay(terminal: Terminal, state: GameState) -> str:
+def draw_overlay(terminal: Terminal, state: GameState) -> list[str]:
     if state.status == Status.RUNNING:
-        return ""
+        return []
     
     messages = {
         Status.START:   ["WELCOME TO SNAKE".center(OVERLAY_WIDTH, " "), "Press any key".center(OVERLAY_WIDTH, " "), "to start".center(OVERLAY_WIDTH, " ")],
@@ -72,7 +72,7 @@ def draw_overlay(terminal: Terminal, state: GameState) -> str:
 
     lines = messages.get(state.status, [])
     if not lines:
-        return ""
+        return []
     
     output = []
     board_rows, board_cols = get_board_dimensions(terminal)
@@ -84,7 +84,7 @@ def draw_overlay(terminal: Terminal, state: GameState) -> str:
         style = terminal.black_on_yellow if state.status == Status.PAUSED else terminal.bold_white_on_red
         output.append(terminal.move_xy(start_x, start_y + i) + style(line))
         
-    return "".join(output)
+    return output
 
 def draw_board(terminal: Terminal, state: GameState, replay_info: tuple[int, int] | None = None) -> str:
     output = []
@@ -151,7 +151,7 @@ def draw_board(terminal: Terminal, state: GameState, replay_info: tuple[int, int
     head_y = margin_y + head.row
     output.append(terminal.move_xy(head_x, head_y) + terminal.bold_green(HEAD))
 
-    output.append(draw_overlay(terminal, state))
+    output.extend(draw_overlay(terminal, state))
 
     return "".join(output)
 
