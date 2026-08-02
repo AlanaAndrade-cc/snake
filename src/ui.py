@@ -30,12 +30,10 @@ def handle_control_key(state: GameState, key: str, initial_snake: Snake, initial
     match key_to_action(key, state.status):
         case Ok(Action.NONE):
             return state
-        case Ok(Action.START):
+        case Ok(Action.START) | Ok(Action.RESUME):
             return start_game(state)
         case Ok(Action.PAUSE):
             return pause_game(state)
-        case Ok(Action.RESUME):
-            return start_game(state)
         case Ok(Action.RESTART):
             return restart_game(state, initial_snake, initial_food, initial_speed)
         case Ok(Action.QUIT):
