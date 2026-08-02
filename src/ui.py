@@ -143,7 +143,7 @@ def draw_overlay(terminal: Terminal, state: GameState, board_rows: int, board_co
         
     return "".join(output)
 
-def game_loop(terminal: Terminal) -> Result[list[GameState], str]:
+def game_loop(terminal: Terminal) -> Result[None, str]:
     board_rows, board_cols = get_board_dimensions(terminal)
     initial_snake = Snake(
         body=(Position(board_rows // 2, board_cols // 2),),
@@ -195,8 +195,12 @@ def game_loop(terminal: Terminal) -> Result[list[GameState], str]:
                 accumulator -= tick_interval
                 if state.status == Status.RUNNING:
                     history.append(state)
+
+            if state.status in STATUS_TO_REPLAY and history:
+                replay(terminal, history)
+                history.clear()
                     
-    return Ok(history)
+    return Ok(None)
 
 def run() -> None:
     terminal = Terminal()
