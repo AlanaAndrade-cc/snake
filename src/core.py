@@ -1,7 +1,6 @@
 "Declarative functions that manipulate game states."
 
 from dataclasses import replace
-from result import Ok, Err, Result
 from models import Direction, GameState, Position, Snake, Status
 
 INVALID_DIRECTION_TRANSITIONS = {
