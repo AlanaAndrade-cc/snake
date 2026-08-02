@@ -94,7 +94,7 @@ def draw_board(terminal: Terminal, state: GameState) -> str:
     record_x = right_edge + 1 - len(record_str)
 
     output.append(terminal.move_xy(score_x, stats_y) + terminal.bold_blue(score_str))
-    output.append(terminal.move_xy(speed_x, stats_y) + terminal.bold_white(speed_str))
+    output.append(terminal.move_xy(speed_x, stats_y) + terminal.bold_magenta(speed_str))
     output.append(terminal.move_xy(record_x, stats_y) + terminal.bold_yellow(record_str))
 
     output.append(terminal.move_xy(pause_x, shortcuts_y) + terminal.bold_white(pause_str))
